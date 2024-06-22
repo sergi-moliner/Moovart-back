@@ -1,11 +1,20 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
+import User from './userModel.js';
 
 const Photo = sequelize.define('Photo', {
-  id: {
+  id_photo: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true
+  },
+  user_id: { // Relación con el usuario que subió la foto
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'id'
+    }
   },
   url: {
     type: DataTypes.STRING,
@@ -32,5 +41,8 @@ const Photo = sequelize.define('Photo', {
   updatedAt: 'updated_at',
   createdAt: 'created_at'
 });
+
+User.hasMany(Photo, { foreignKey: 'user_id' });
+Photo.belongsTo(User, { foreignKey: 'user_id' });
 
 export default Photo;

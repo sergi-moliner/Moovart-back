@@ -3,7 +3,7 @@ import { sequelize } from '../db.js';
 import User from './userModel.js';
 
 const Local = sequelize.define('Local', {
-  id: {
+  id_local: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true

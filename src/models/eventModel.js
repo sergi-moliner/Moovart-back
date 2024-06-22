@@ -1,15 +1,20 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
+import User from './userModel.js';
 
 const Event = sequelize.define('Event', {
-  id: {
+  id_event: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true
   },
-  venue_id: {
+  user_id: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'id'
+    }
   },
   title: {
     type: DataTypes.STRING,
@@ -80,5 +85,8 @@ const Event = sequelize.define('Event', {
   updatedAt: 'updated_at',
   createdAt: 'created_at'
 });
+
+User.hasMany(Event, { foreignKey: 'user_id' });
+Event.belongsTo(User, { foreignKey: 'user_id' });
 
 export default Event;
