@@ -8,6 +8,7 @@ import artistRoutes from './routes/artistRoutes.js';
 import localRoutes from './routes/localRoutes.js';
 import photoRoutes from './routes/photoRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
+import portfolioRoutes from './routes/portfolioRoutes.js';
 import { testConnection } from './db.js';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -46,6 +47,7 @@ app.use('/artists', artistRoutes);
 app.use('/locals', localRoutes);
 app.use('/photos', photoRoutes);
 app.use('/events', eventRoutes);
+app.use('/portfolios', portfolioRoutes);
 
 // Iniciar el servidor
 app.listen(PORT, async () => {

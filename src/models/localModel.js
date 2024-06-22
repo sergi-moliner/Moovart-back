@@ -13,7 +13,7 @@ const Local = sequelize.define('Local', {
     allowNull: false,
     references: {
       model: User,
-      key: 'id'
+      key: 'id_user'
     }
   },
   name: {

@@ -13,7 +13,7 @@ const Artist = sequelize.define('Artist', {
     allowNull: false,
     references: {
       model: User,
-      key: 'id'
+      key: 'id_user'
     }
   },
   bio: {

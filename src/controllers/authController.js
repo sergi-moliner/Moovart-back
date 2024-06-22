@@ -123,7 +123,6 @@ export const forgotPassword = async (req, res) => {
   try {
     const errors = validationResult(req);
 
-    // If there are validation errors, respond with a 400 Bad Request status
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
@@ -190,14 +189,12 @@ export const changePassword = async (req, res) => {
   try {
     const errors = validationResult(req);
 
-    // If there are validation errors, respond with a 400 Bad Request status
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { token, password } = req.body;
 
-    //Reviso si el Token existe
     let token_row = await RecoveryToken.findOne({ where: { token } });
     if (!token_row) {
       return res.status(404).json({
@@ -205,8 +202,7 @@ export const changePassword = async (req, res) => {
         message: 'Token Incorrecto'
       });
     } 
-
-    // Buscar un usuario por su ID en la base de datos
+    
     const user = await User.findOne({ where: { id_user: token_row.user_id } });
     if (!user) {
       return res.status(404).json({
@@ -214,7 +210,6 @@ export const changePassword = async (req, res) => {
         message: 'Usuario no encontrado'
       });
     }
-
 
     // Actualizar la contraseña del usuario
     user.password = await bcrypt.hash(password, Number(process.env.BCRYPT_SALT));

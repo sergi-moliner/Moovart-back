@@ -8,12 +8,12 @@ const Photo = sequelize.define('Photo', {
     autoIncrement: true,
     primaryKey: true
   },
-  user_id: { // Relación con el usuario que subió la foto
+  user_id: { 
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
       model: User,
-      key: 'id'
+      key: 'id_user'
     }
   },
   url: {

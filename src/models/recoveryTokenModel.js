@@ -18,7 +18,7 @@ const RecoveryToken = sequelize.define('RecoveryToken', {
     allowNull: false,
     references: {
       model: 'Users',
-      key: 'id'
+      key: 'id_user'
     }
   },
   created_at: {
