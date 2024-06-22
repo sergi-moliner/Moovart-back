@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
 import User from './userModel.js';
+import Photo from './photoModel.js';
 
 const Event = sequelize.define('Event', {
   id_event: {
@@ -70,7 +71,11 @@ const Event = sequelize.define('Event', {
   },
   profile_photo_id: {
     type: DataTypes.INTEGER,
-    defaultValue: null
+    allowNull: true,
+    references: {
+      model: Photo,
+      key: 'id_photo'
+    }
   },
   confirmed: {
     type: DataTypes.BOOLEAN,
@@ -88,5 +93,7 @@ const Event = sequelize.define('Event', {
 
 User.hasMany(Event, { foreignKey: 'user_id' });
 Event.belongsTo(User, { foreignKey: 'user_id' });
+Photo.hasMany(Event, { foreignKey: 'profile_photo_id' });
+Event.belongsTo(Photo, { foreignKey: 'profile_photo_id' });
 
 export default Event;

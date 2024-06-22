@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
 import User from './userModel.js';
+import Photo from './photoModel.js';
 
 const Local = sequelize.define('Local', {
   id_local: {
@@ -54,7 +55,11 @@ const Local = sequelize.define('Local', {
   },
   profile_photo_id: {
     type: DataTypes.INTEGER,
-    defaultValue: null
+    allowNull: true,
+    references: {
+      model: Photo,
+      key: 'id_photo'
+    }
   }
 }, {
   timestamps: true,
@@ -64,5 +69,7 @@ const Local = sequelize.define('Local', {
 
 User.hasOne(Local, { foreignKey: 'user_id' });
 Local.belongsTo(User, { foreignKey: 'user_id' });
+Photo.hasMany(Local, { foreignKey: 'profile_photo_id' });
+Local.belongsTo(Photo, { foreignKey: 'profile_photo_id' });
 
 export default Local;
