@@ -4,7 +4,7 @@ import User from './userModel.js';
 import Subscription from './subscriptionModel.js';
 
 const Notification = sequelize.define('Notification', {
-  id: {
+  id_notification: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true

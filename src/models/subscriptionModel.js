@@ -4,7 +4,7 @@ import User from './userModel.js';
 import Event from './eventModel.js';
 
 const Subscription = sequelize.define('Subscription', {
-  id: {
+  id_subscription: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true
