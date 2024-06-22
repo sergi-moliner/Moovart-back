@@ -1,35 +1,33 @@
-import Local from '../models/localModel.js'; // Asegúrate de importar el modelo correcto
+import Local from '../models/localModel.js'; 
 import User from '../models/userModel.js';
 
 export const createLocal = async (req, res) => {
-  try {
-    const { user_id, name, address, city, bio, exhibition_space, accepted_sizes, contact_info, latitude, longitude, profile_photo_id } = req.body;
-    
-    // Asegúrate de que todos los datos necesarios están presentes
-    if (!user_id || !name) {
-      return res.status(400).json({
-        code: -1,
-        message: 'user_id and name are required'
+    try {
+      const { user_id, name, address, city, bio, exhibition_space, accepted_sizes, contact_info, latitude, longitude, profile_photo_id } = req.body;
+      
+      if (!user_id || !name || !address || !city || !latitude || !longitude) {
+        return res.status(400).json({
+          code: -1,
+          message: 'user_id, name, address, city, latitude, and longitude are required'
+        });
+      }
+  
+      const local = await Local.create({ user_id, name, address, city, bio, exhibition_space, accepted_sizes, contact_info, latitude, longitude, profile_photo_id });
+  
+      res.status(201).json({
+        code: 1,
+        message: 'Local created successfully',
+        data: local
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        code: -100,
+        message: 'An error occurred while creating the local',
+        error: error.message
       });
     }
-
-    // Crea el local
-    const local = await Local.create({ user_id, name, address, city, bio, exhibition_space, accepted_sizes, contact_info, latitude, longitude, profile_photo_id });
-
-    res.status(201).json({
-      code: 1,
-      message: 'Local created successfully',
-      data: local
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      code: -100,
-      message: 'An error occurred while creating the local',
-      error: error.message
-    });
-  }
-};
+  };
 
 export const getLocal = async (req, res) => {
   try {
@@ -55,6 +53,26 @@ export const getLocal = async (req, res) => {
     });
   }
 };
+
+export const getAllLocals = async (req, res) => {
+    try {
+        const locals = await Local.findAll({
+        include: User
+        });
+        res.status(200).json({
+        code: 1,
+        message: 'Locals List',
+        data: locals
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+        code: -100,
+        message: 'An error occurred while obtaining the locals'
+        });
+    }
+    };
+
 
 export const updateLocal = async (req, res) => {
   try {

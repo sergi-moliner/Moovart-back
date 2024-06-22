@@ -6,6 +6,8 @@ import userRoutes from './routes/userRoutes.js';
 import testRoutes from './routes/testRoutes.js';
 import artistRoutes from './routes/artistRoutes.js';
 import localRoutes from './routes/localRoutes.js';
+import photoRoutes from './routes/photoRoutes.js';
+import eventRoutes from './routes/eventRoutes.js';
 import { testConnection } from './db.js';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -42,6 +44,8 @@ app.use('/user', userRoutes);
 app.use('/test', testRoutes);
 app.use('/artists', artistRoutes);
 app.use('/locals', localRoutes);
+app.use('/photos', photoRoutes);
+app.use('/events', eventRoutes);
 
 // Iniciar el servidor
 app.listen(PORT, async () => {
