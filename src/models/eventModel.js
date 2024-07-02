@@ -1,7 +1,5 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
-import User from './userModel.js';
-import Photo from './photoModel.js';
 
 const Event = sequelize.define('Event', {
   id_event: {
@@ -11,11 +9,7 @@ const Event = sequelize.define('Event', {
   },
   user_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id_user'
-    }
+    allowNull: false
   },
   title: {
     type: DataTypes.STRING,
@@ -62,7 +56,7 @@ const Event = sequelize.define('Event', {
     defaultValue: null
   },
   color: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(7),
     defaultValue: null
   },
   all_day: {
@@ -71,11 +65,7 @@ const Event = sequelize.define('Event', {
   },
   profile_photo_id: {
     type: DataTypes.INTEGER,
-    allowNull: true,
-    references: {
-      model: Photo,
-      key: 'id_photo'
-    }
+    allowNull: true
   },
   confirmed: {
     type: DataTypes.BOOLEAN,
@@ -90,10 +80,5 @@ const Event = sequelize.define('Event', {
   updatedAt: 'updated_at',
   createdAt: 'created_at'
 });
-
-User.hasMany(Event, { foreignKey: 'user_id' });
-Event.belongsTo(User, { foreignKey: 'user_id' });
-Photo.hasMany(Event, { foreignKey: 'profile_photo_id' });
-Event.belongsTo(Photo, { foreignKey: 'profile_photo_id' });
 
 export default Event;

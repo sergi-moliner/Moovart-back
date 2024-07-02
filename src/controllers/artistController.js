@@ -1,5 +1,6 @@
 import Artist from '../models/artistModel.js';
 import User from '../models/userModel.js';
+import Photo from '../models/photoModel.js';
 
 export const createArtist = async (req, res) => {
   try {
@@ -95,6 +96,21 @@ export const deleteArtist = async (req, res) => {
     res.status(500).json({
       code: -100,
       message: 'An error occurred while deleting the artist',
+      error: error.message
+    });
+  }
+};
+
+export const getAllArtists = async (req, res) => {
+  try {
+    const artists = await Artist.findAll({
+      include: [User, { model: Photo, as: 'profilePhoto' }, { model: Photo, as: 'featuredWorkPhoto' }]
+    });
+    res.status(200).json(artists);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: 'Error al obtener los artistas',
       error: error.message
     });
   }

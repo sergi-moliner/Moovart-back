@@ -1,17 +1,15 @@
 import bcrypt from 'bcrypt';
-import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import User from '../models/userModel.js';
-import RecoveryToken from '../models/recoveryTokenModel.js';
-import sendEmail from "../utils/email/sendEmail.js";
 import { validationResult } from 'express-validator';
 import { serialize } from 'cookie';
-// Creación de funciones personalizadas
+import User from '../models/userModel.js';
+import Artist from '../models/artistModel.js';
+import Local from '../models/localModel.js';
+import RecoveryToken from '../models/recoveryTokenModel.js';
+import sendEmail from "../utils/email/sendEmail.js";
 import { esPar, contraseniasCoinciden } from '../utils/utils.js';
 
-const clietURL = process.env.CLIENT_URL;
-// src/controllers/authController.js
-
+const clientURL = process.env.CLIENT_URL;
 
 export const register = async (req, res) => {
   try {
@@ -32,10 +30,16 @@ export const register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, Number(process.env.BCRYPT_SALT));
-    const newUser = new User({ email, password: hashedPassword, name, city, user_type, status: 1 });
-    await newUser.save();
+    const newUser = await User.create({ email, password: hashedPassword, name, city, user_type });
 
-    const accessToken = jwt.sign({ id_user: newUser.id, name: newUser.name }, process.env.JWT_SECRET);
+    // Crear registro correspondiente en Artists o Locals
+    if (user_type === 'artist') {
+      await Artist.create({ user_id: newUser.id_user });
+    } else if (user_type === 'local') {
+      await Local.create({ user_id: newUser.id_user });
+    }
+
+    const accessToken = jwt.sign({ id_user: newUser.id_user, name: newUser.name }, process.env.JWT_SECRET);
     const token = serialize('token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -48,16 +52,44 @@ export const register = async (req, res) => {
     res.status(200).json({
       code: 1,
       message: 'Usuario registrado correctamente',
+      data: {
+        user: {
+          id: newUser.id_user,
+          name: newUser.name,
+          email: newUser.email,
+          city: newUser.city,
+          user_type: newUser.user_type
+        },
+        accessToken: accessToken
+      }
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error en el registro de usuario:', error);
     res.status(500).json({
       code: -100,
       message: 'Ha ocurrido un error al registrar el usuario',
-      error: error,
+      error: error.message,
     });
   }
 };
+
+export const getUserProfile = async (req, res) => {
+  try {
+    const user = req.user;
+    if (user.user_type === 'artist') {
+      const artistProfile = await Artist.findOne({ where: { user_id: user.id_user } });
+      res.status(200).json({ ...user.toJSON(), artist: artistProfile });
+    } else if (user.user_type === 'local') {
+      const localProfile = await Local.findOne({ where: { user_id: user.id_user } });
+      res.status(200).json({ ...user.toJSON(), local: localProfile });
+    } else {
+      res.status(400).json({ message: 'Invalid user type' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
 
 export const login = async (req, res) => {
   try {

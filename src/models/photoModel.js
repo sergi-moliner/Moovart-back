@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
-import User from './userModel.js';
 
 const Photo = sequelize.define('Photo', {
   id_photo: {
@@ -8,13 +7,9 @@ const Photo = sequelize.define('Photo', {
     autoIncrement: true,
     primaryKey: true
   },
-  user_id: { 
+  user_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id_user'
-    }
+    allowNull: true
   },
   url: {
     type: DataTypes.STRING,
@@ -22,10 +17,6 @@ const Photo = sequelize.define('Photo', {
   },
   entity_type: {
     type: DataTypes.ENUM('event', 'artist', 'local'),
-    allowNull: false
-  },
-  entity_id: {
-    type: DataTypes.INTEGER,
     allowNull: false
   },
   description: {
@@ -41,8 +32,5 @@ const Photo = sequelize.define('Photo', {
   updatedAt: 'updated_at',
   createdAt: 'created_at'
 });
-
-User.hasMany(Photo, { foreignKey: 'user_id' });
-Photo.belongsTo(User, { foreignKey: 'user_id' });
 
 export default Photo;

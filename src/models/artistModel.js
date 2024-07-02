@@ -1,7 +1,5 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
-import User from './userModel.js';
-import Photo from './photoModel.js';
 
 const Artist = sequelize.define('Artist', {
   id_artist: {
@@ -13,7 +11,7 @@ const Artist = sequelize.define('Artist', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: User,
+      model: 'Users',
       key: 'id_user'
     }
   },
@@ -35,21 +33,28 @@ const Artist = sequelize.define('Artist', {
   },
   profile_photo_id: {
     type: DataTypes.INTEGER,
-    allowNull: true,
+    defaultValue: null,
     references: {
-      model: Photo,
+      model: 'Photos',
       key: 'id_photo'
     }
+  },
+  featured_work_photo_id: {
+    type: DataTypes.INTEGER,
+    defaultValue: null
+  },
+  genre: {
+    type: DataTypes.STRING,
+    defaultValue: null
+  },
+  experience_level: {
+    type: DataTypes.STRING,
+    defaultValue: null
   }
 }, {
   timestamps: true,
   updatedAt: 'updated_at',
   createdAt: 'created_at'
 });
-
-User.hasOne(Artist, { foreignKey: 'user_id' });
-Artist.belongsTo(User, { foreignKey: 'user_id' });
-Photo.hasMany(Artist, { foreignKey: 'profile_photo_id' });
-Artist.belongsTo(Photo, { foreignKey: 'profile_photo_id' });
 
 export default Artist;

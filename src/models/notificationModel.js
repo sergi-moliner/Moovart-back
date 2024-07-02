@@ -1,7 +1,5 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
-import User from './userModel.js';
-import Subscription from './subscriptionModel.js';
 
 const Notification = sequelize.define('Notification', {
   id_notification: {
@@ -11,19 +9,11 @@ const Notification = sequelize.define('Notification', {
   },
   user_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id_user'
-    }
+    allowNull: false
   },
   subscription_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Subscription,
-      key: 'id_subscription'
-    }
+    allowNull: false
   },
   message: {
     type: DataTypes.TEXT,
@@ -38,12 +28,9 @@ const Notification = sequelize.define('Notification', {
     defaultValue: DataTypes.NOW
   }
 }, {
-  timestamps: false
+  timestamps: true,
+  updatedAt: 'updated_at',
+  createdAt: 'created_at'
 });
-
-User.hasMany(Notification, { foreignKey: 'user_id' });
-Subscription.hasMany(Notification, { foreignKey: 'subscription_id' });
-Notification.belongsTo(User, { foreignKey: 'user_id' });
-Notification.belongsTo(Subscription, { foreignKey: 'subscription_id' });
 
 export default Notification;

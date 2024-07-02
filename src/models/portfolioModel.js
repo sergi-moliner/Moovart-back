@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
-import Artist from './artistModel.js'; 
 
 const Portfolio = sequelize.define('Portfolio', {
   id_portfolio: {
@@ -10,11 +9,7 @@ const Portfolio = sequelize.define('Portfolio', {
   },
   artist_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Artist,
-      key: 'id_artist'
-    }
+    allowNull: false
   },
   url: {
     type: DataTypes.STRING,
@@ -29,8 +24,5 @@ const Portfolio = sequelize.define('Portfolio', {
   updatedAt: 'updated_at',
   createdAt: 'created_at'
 });
-
-Artist.hasMany(Portfolio, { foreignKey: 'artist_id' });
-Portfolio.belongsTo(Artist, { foreignKey: 'artist_id' });
 
 export default Portfolio;

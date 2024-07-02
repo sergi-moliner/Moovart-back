@@ -69,7 +69,5 @@ const Local = sequelize.define('Local', {
 
 User.hasOne(Local, { foreignKey: 'user_id' });
 Local.belongsTo(User, { foreignKey: 'user_id' });
-Photo.hasMany(Local, { foreignKey: 'profile_photo_id' });
-Local.belongsTo(Photo, { foreignKey: 'profile_photo_id' });
 
 export default Local;

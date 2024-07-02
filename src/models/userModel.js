@@ -5,31 +5,30 @@ const User = sequelize.define('User', {
   id_user: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
-    primaryKey: true,
+    primaryKey: true
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: false
   },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
+    unique: true
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: false
   },
   city: {
     type: DataTypes.STRING,
-    allowNull: false,
+    defaultValue: null
   },
   user_type: {
     type: DataTypes.ENUM('artist', 'local'),
-    allowNull: false,
-  },
+    allowNull: false
+  }
 }, {
-  indexes: [{ unique: true, fields: ['email'] }],
   timestamps: true,
   updatedAt: 'updated_at',
   createdAt: 'created_at'

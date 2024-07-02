@@ -1,35 +1,24 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
-import Event from './eventModel.js';
-import Artist from './artistModel.js';
 
 const EventArtist = sequelize.define('EventArtist', {
-  id_eventArtist: {
+  id_event_artist: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true
   },
   event_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Event,
-      key: 'id_event'
-    }
+    allowNull: false
   },
   artist_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Artist,
-      key: 'id_artist'
-    }
+    allowNull: false
   }
 }, {
-  timestamps: false
+  timestamps: true,
+  updatedAt: 'updated_at',
+  createdAt: 'created_at'
 });
-
-Event.belongsToMany(Artist, { through: EventArtist, foreignKey: 'event_id' });
-Artist.belongsToMany(Event, { through: EventArtist, foreignKey: 'artist_id' });
 
 export default EventArtist;
