@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
+import User from './userModel.js';
 
 const Artist = sequelize.define('Artist', {
   id_artist: {
@@ -9,52 +10,45 @@ const Artist = sequelize.define('Artist', {
   },
   user_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'Users',
-      key: 'id_user'
-    }
+    allowNull: false
   },
   bio: {
     type: DataTypes.TEXT,
-    defaultValue: null
+    allowNull: true
   },
   contact_info: {
-    type: DataTypes.JSON,
-    defaultValue: null
+    type: DataTypes.STRING,
+    allowNull: true
   },
   cv: {
     type: DataTypes.TEXT,
-    defaultValue: null
+    allowNull: true
   },
   featured: {
     type: DataTypes.TEXT,
-    defaultValue: null
+    allowNull: true
   },
   profile_photo_id: {
     type: DataTypes.INTEGER,
-    defaultValue: null,
-    references: {
-      model: 'Photos',
-      key: 'id_photo'
-    }
+    allowNull: true
   },
   featured_work_photo_id: {
     type: DataTypes.INTEGER,
-    defaultValue: null
+    allowNull: true
   },
   genre: {
     type: DataTypes.STRING,
-    defaultValue: null
+    allowNull: true
   },
   experience_level: {
     type: DataTypes.STRING,
-    defaultValue: null
+    allowNull: true
   }
 }, {
   timestamps: true,
   updatedAt: 'updated_at',
   createdAt: 'created_at'
 });
+
 
 export default Artist;

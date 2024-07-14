@@ -12,6 +12,8 @@ import portfolioRoutes from './routes/portfolioRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import eventArtistRoutes from './routes/eventArtistRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
+
 import { testConnection } from './db.js';
 import dotenv from 'dotenv';
 
@@ -29,8 +31,11 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/uploads', express.static('uploads'));
+
 app.use('/auth', authRoutes);
-app.use('/user', userRoutes);
+app.use('/users', userRoutes);
+app.use('/profile', profileRoutes)
 app.use('/test', testRoutes);
 app.use('/artists', artistRoutes);
 app.use('/locals', localRoutes);

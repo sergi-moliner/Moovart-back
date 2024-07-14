@@ -1,13 +1,15 @@
 import { Router } from 'express';
-import { createArtist, getArtist, updateArtist, deleteArtist, getAllArtists } from '../controllers/artistController.js';
+import { createArtist, getArtistsByUser, updateArtist, deleteArtist, getAllArtists } from '../controllers/artistController.js';
 import { authenticateToken } from '../middlewares/authenticateToken.js';
 
 const router = Router();
 
-router.post('/', authenticateToken(['user']), createArtist);
-router.get('/:id', authenticateToken(['user']), getArtist);
-router.put('/:id', authenticateToken(['user']), updateArtist);
-router.delete('/:id', authenticateToken(['user']), deleteArtist);
+
 router.get('/', getAllArtists);
+
+router.post('/', authenticateToken(['user']), createArtist);
+router.get('/user/:userId', authenticateToken(['user']), getArtistsByUser);
+router.put('/:artistId', authenticateToken(['user']), updateArtist);
+router.delete('/:artistId', authenticateToken(['user']), deleteArtist);
 
 export default router;

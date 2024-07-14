@@ -3,11 +3,9 @@ import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 import { serialize } from 'cookie';
 import User from '../models/userModel.js';
+import Profile from '../models/profileModel.js';
 import Artist from '../models/artistModel.js';
 import Local from '../models/localModel.js';
-import RecoveryToken from '../models/recoveryTokenModel.js';
-import sendEmail from "../utils/email/sendEmail.js";
-import { esPar, contraseniasCoinciden } from '../utils/utils.js';
 
 const clientURL = process.env.CLIENT_URL;
 
@@ -31,6 +29,9 @@ export const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, Number(process.env.BCRYPT_SALT));
     const newUser = await User.create({ email, password: hashedPassword, name, city, user_type });
+
+    // Crear perfil vacío para el usuario
+    const newProfile = await Profile.create({ user_id: newUser.id_user });
 
     // Crear registro correspondiente en Artists o Locals
     if (user_type === 'artist') {
@@ -58,7 +59,8 @@ export const register = async (req, res) => {
           name: newUser.name,
           email: newUser.email,
           city: newUser.city,
-          user_type: newUser.user_type
+          user_type: newUser.user_type,
+          profile_photo_url: newProfile.profile_photo_url
         },
         accessToken: accessToken
       }
@@ -73,24 +75,6 @@ export const register = async (req, res) => {
   }
 };
 
-export const getUserProfile = async (req, res) => {
-  try {
-    const user = req.user;
-    if (user.user_type === 'artist') {
-      const artistProfile = await Artist.findOne({ where: { user_id: user.id_user } });
-      res.status(200).json({ ...user.toJSON(), artist: artistProfile });
-    } else if (user.user_type === 'local') {
-      const localProfile = await Local.findOne({ where: { user_id: user.id_user } });
-      res.status(200).json({ ...user.toJSON(), local: localProfile });
-    } else {
-      res.status(400).json({ message: 'Invalid user type' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
-  }
-};
-
-
 export const login = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -101,11 +85,11 @@ export const login = async (req, res) => {
 
     const { email, password } = req.body;
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email }, include: Profile });
     if (!user) {
       return res.status(401).json({
         code: -25,
-        message: 'user No exist'
+        message: 'Usuario no existe'
       });
     }
 
@@ -117,7 +101,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const accessToken = jwt.sign({ id_user: user.id, name: user.name }, process.env.JWT_SECRET);
+    const accessToken = jwt.sign({ id_user: user.id_user, name: user.name }, process.env.JWT_SECRET);
     const token = serialize('token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -132,10 +116,12 @@ export const login = async (req, res) => {
       message: 'Login OK',
       data: {
         user: {
+          id: user.id_user,
           name: user.name,
           email: user.email,
           city: user.city,
-          user_type: user.user_type
+          user_type: user.user_type,
+          profile_photo_url: user.Profile ? user.Profile.profile_photo_url : ''
         },
         token: accessToken // Eliminar después de las pruebas
       }
@@ -149,7 +135,6 @@ export const login = async (req, res) => {
     });
   }
 };
-
 
 export const forgotPassword = async (req, res) => {
   try {

@@ -1,5 +1,8 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
+import User from './userModel.js';
+import Event from './eventModel.js';
+import Notification from './notificationModel.js';
 
 const Subscription = sequelize.define('Subscription', {
   id_subscription: {
@@ -24,5 +27,6 @@ const Subscription = sequelize.define('Subscription', {
   updatedAt: 'updated_at',
   createdAt: 'created_at'
 });
+
 
 export default Subscription;

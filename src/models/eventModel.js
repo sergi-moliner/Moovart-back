@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
+import User from './userModel.js';
 
 const Event = sequelize.define('Event', {
   id_event: {
@@ -44,7 +45,7 @@ const Event = sequelize.define('Event', {
     defaultValue: null
   },
   contact_details: {
-    type: DataTypes.JSON,
+    type: DataTypes.STRING,
     defaultValue: null
   },
   optional_details: {
@@ -80,5 +81,6 @@ const Event = sequelize.define('Event', {
   updatedAt: 'updated_at',
   createdAt: 'created_at'
 });
+
 
 export default Event;

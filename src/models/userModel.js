@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
+import Profile from './profileModel.js';
 
 const User = sequelize.define('User', {
   id_user: {
@@ -22,7 +23,7 @@ const User = sequelize.define('User', {
   },
   city: {
     type: DataTypes.STRING,
-    defaultValue: null
+    allowNull: false
   },
   user_type: {
     type: DataTypes.ENUM('artist', 'local'),
@@ -33,5 +34,9 @@ const User = sequelize.define('User', {
   updatedAt: 'updated_at',
   createdAt: 'created_at'
 });
+
+// Define the association
+User.hasOne(Profile, { foreignKey: 'user_id' });
+Profile.belongsTo(User, { foreignKey: 'user_id' });
 
 export default User;

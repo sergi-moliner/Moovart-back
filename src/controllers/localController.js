@@ -1,135 +1,83 @@
-import Local from '../models/localModel.js'; 
-import User from '../models/userModel.js';
+import Local from '../models/localModel.js';
+import UserLocal from '../models/userLocalModel.js';
+import Photo from '../models/photoModel.js';
 
-export const createLocal = async (req, res) => {
-    try {
-      const { user_id, name, address, city, bio, exhibition_space, accepted_sizes, contact_info, latitude, longitude, profile_photo_id } = req.body;
-      
-      if (!user_id || !name || !address || !city || !latitude || !longitude) {
-        return res.status(400).json({
-          code: -1,
-          message: 'user_id, name, address, city, latitude, and longitude are required'
-        });
-      }
-  
-      const local = await Local.create({ user_id, name, address, city, bio, exhibition_space, accepted_sizes, contact_info, latitude, longitude, profile_photo_id });
-  
-      res.status(201).json({
-        code: 1,
-        message: 'Local created successfully',
-        data: local
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        code: -100,
-        message: 'An error occurred while creating the local',
-        error: error.message
-      });
-    }
-  };
-
-export const getLocal = async (req, res) => {
+// Rutas públicas
+export const getAllLocals = async (req, res) => {
   try {
-    const local = await Local.findByPk(req.params.id, {
-      include: User
+    const locals = await Local.findAll({
+      include: [{
+        model: Photo,
+        as: 'photos'
+      }]
     });
-    if (!local) {
-      return res.status(404).json({
-        code: -10,
-        message: 'Local not found'
-      });
-    }
-    res.status(200).json({
-      code: 1,
-      message: 'Local Detail',
-      data: local
-    });
+    res.json(locals);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      code: -100,
-      message: 'An error occurred while obtaining the local'
-    });
+    res.status(500).json({ error: 'An error occurred while fetching locals.' });
   }
 };
 
-export const getAllLocals = async (req, res) => {
-    try {
-        const locals = await Local.findAll({
-        include: User
-        });
-        res.status(200).json({
-        code: 1,
-        message: 'Locals List',
-        data: locals
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-        code: -100,
-        message: 'An error occurred while obtaining the locals'
-        });
-    }
-    };
+// Rutas protegidas
+export const createLocal = async (req, res) => {
+  try {
+    const { user_id, name, address, city, bio, exhibition_space, accepted_sizes, contact_info, latitude, longitude, profile_photo_id } = req.body;
 
+    const newLocal = await Local.create({ name, address, city, bio, exhibition_space, accepted_sizes, contact_info, latitude, longitude, profile_photo_id });
+    await UserLocal.create({ user_id, local_id: newLocal.id_local });
+
+    res.status(201).json(newLocal);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create local' });
+  }
+};
+
+export const getLocalsByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const userLocals = await UserLocal.findAll({ where: { user_id: userId }, include: [Local] });
+
+    res.status(200).json(userLocals);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch locals' });
+  }
+};
 
 export const updateLocal = async (req, res) => {
   try {
-    const { name, address, city, bio, exhibition_space, accepted_sizes, contact_info, latitude, longitude, profile_photo_id } = req.body;
-    const local = await Local.findByPk(req.params.id);
-    if (!local) {
-      return res.status(404).json({
-        code: -10,
-        message: 'Local not found'
-      });
+    const { localId } = req.params;
+    const updatedData = req.body;
+
+    const [updated] = await Local.update(updatedData, { where: { id_local: localId } });
+
+    if (!updated) {
+      return res.status(404).json({ error: 'Local not found' });
     }
-    local.name = name || local.name;
-    local.address = address || local.address;
-    local.city = city || local.city;
-    local.bio = bio || local.bio;
-    local.exhibition_space = exhibition_space || local.exhibition_space;
-    local.accepted_sizes = accepted_sizes || local.accepted_sizes;
-    local.contact_info = contact_info || local.contact_info;
-    local.latitude = latitude || local.latitude;
-    local.longitude = longitude || local.longitude;
-    local.profile_photo_id = profile_photo_id || local.profile_photo_id;
-    await local.save();
-    res.status(200).json({
-      code: 1,
-      message: 'Local updated successfully',
-      data: local
-    });
+
+    const updatedLocal = await Local.findOne({ where: { id_local: localId } });
+
+    res.status(200).json(updatedLocal);
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      code: -100,
-      message: 'An error occurred while updating the local',
-      error: error.message
-    });
+    res.status(500).json({ error: 'Failed to update local' });
   }
 };
 
 export const deleteLocal = async (req, res) => {
   try {
-    const local = await Local.findByPk(req.params.id);
-    if (!local) {
-      return res.status(404).json({
-        code: -10,
-        message: 'Local not found'
-      });
+    const { localId } = req.params;
+
+    await UserLocal.destroy({ where: { local_id: localId } });
+    const deleted = await Local.destroy({ where: { id_local: localId } });
+
+    if (!deleted) {
+      return res.status(404).json({ error: 'Local not found' });
     }
-    await local.destroy();
-    res.status(200).json({
-      code: 1,
-      message: 'Local deleted successfully'
-    });
+
+    res.status(204).json();
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      code: -100,
-      message: 'An error occurred while deleting the local',
-      error: error.message
-    });
+    res.status(500).json({ error: 'Failed to delete local' });
   }
 };

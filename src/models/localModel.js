@@ -1,7 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
 import User from './userModel.js';
-import Photo from './photoModel.js';
 
 const Local = sequelize.define('Local', {
   id_local: {
@@ -11,11 +10,7 @@ const Local = sequelize.define('Local', {
   },
   user_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id_user'
-    }
+    allowNull: false
   },
   name: {
     type: DataTypes.STRING,
@@ -23,43 +18,39 @@ const Local = sequelize.define('Local', {
   },
   address: {
     type: DataTypes.STRING,
-    defaultValue: null
+    allowNull: true
   },
   city: {
     type: DataTypes.STRING,
-    defaultValue: null
+    allowNull: true
   },
   bio: {
     type: DataTypes.TEXT,
-    defaultValue: null
+    allowNull: true
   },
   exhibition_space: {
     type: DataTypes.INTEGER,
-    defaultValue: null
+    allowNull: true
   },
   accepted_sizes: {
     type: DataTypes.STRING,
-    defaultValue: null
+    allowNull: true
   },
   contact_info: {
-    type: DataTypes.JSON,
-    defaultValue: null
+    type: DataTypes.STRING,
+    allowNull: true
   },
   latitude: {
     type: DataTypes.DECIMAL(9, 6),
-    defaultValue: null
+    allowNull: true
   },
   longitude: {
     type: DataTypes.DECIMAL(9, 6),
-    defaultValue: null
+    allowNull: true
   },
   profile_photo_id: {
     type: DataTypes.INTEGER,
-    allowNull: true,
-    references: {
-      model: Photo,
-      key: 'id_photo'
-    }
+    allowNull: true
   }
 }, {
   timestamps: true,
@@ -67,7 +58,7 @@ const Local = sequelize.define('Local', {
   createdAt: 'created_at'
 });
 
-User.hasOne(Local, { foreignKey: 'user_id' });
-Local.belongsTo(User, { foreignKey: 'user_id' });
+User.belongsToMany(Local, { through: 'UserLocals', foreignKey: 'user_id' });
+Local.belongsToMany(User, { through: 'UserLocals', foreignKey: 'local_id' });
 
 export default Local;

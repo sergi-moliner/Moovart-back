@@ -1,9 +1,10 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db.js';
 import User from './userModel.js';
+import Photo from './photoModel.js';
 
-const Photo = sequelize.define('Photo', {
-  id_photo: {
+const Profile = sequelize.define('Profile', {
+  id_profile: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true
@@ -17,9 +18,17 @@ const Photo = sequelize.define('Photo', {
     },
     onDelete: 'CASCADE'
   },
-  url: {
+  bio: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  website: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
+  },
+  profile_photo_url: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   timestamps: true,
@@ -27,4 +36,7 @@ const Photo = sequelize.define('Photo', {
   createdAt: 'created_at'
 });
 
-export default Photo;
+Profile.hasMany(Photo, { foreignKey: 'user_id' });
+Photo.belongsTo(Profile, { foreignKey: 'user_id' });
+
+export default Profile;

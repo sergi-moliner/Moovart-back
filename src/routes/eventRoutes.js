@@ -1,12 +1,16 @@
-import express from 'express';
-import eventController from '../controllers/eventController.js';
+import { Router } from 'express';
+import { getAllEvents, getEventById, createEvent, updateEvent, deleteEvent } from '../controllers/eventController.js';
+import { authenticateToken } from '../middlewares/authenticateToken.js';
 
-const router = express.Router();
+const router = Router();
 
-router.get('/events', eventController.getAllEvents);
-router.get('/events/:id', eventController.getEventById);
-router.post('/events', eventController.createEvent);
-router.put('/events/:id', eventController.updateEvent);
-router.delete('/events/:id', eventController.deleteEvent);
+// Rutas públicas
+router.get('/', getAllEvents);
+router.get('/:id', getEventById);
+
+// Rutas protegidas
+router.post('/', authenticateToken(['user']), createEvent);
+router.put('/:id', authenticateToken(['user']), updateEvent);
+router.delete('/:id', authenticateToken(['user']), deleteEvent);
 
 export default router;

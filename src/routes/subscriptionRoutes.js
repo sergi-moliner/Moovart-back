@@ -1,11 +1,11 @@
 import express from 'express';
-import subscriptionController from '../controllers/subscriptionController.js';
+import { getAllSubscriptions, getSubscriptionsByUserId, createSubscription, deleteSubscription } from '../controllers/subscriptionController.js';
 
 const router = express.Router();
 
-router.get('/subscriptions', subscriptionController.getAllSubscriptions);
-router.get('/subscriptions/user/:user_id', subscriptionController.getSubscriptionsByUserId);
-router.post('/subscriptions', subscriptionController.createSubscription);
-router.delete('/subscriptions/:id', subscriptionController.deleteSubscription);
+router.get('/subscriptions', getAllSubscriptions);
+router.get('/subscriptions/user/:user_id', getSubscriptionsByUserId);
+router.post('/subscriptions', createSubscription);
+router.delete('/subscriptions/:id', deleteSubscription);
 
 export default router;
