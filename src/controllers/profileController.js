@@ -5,8 +5,9 @@ import Local from '../models/localModel.js';
 import Event from '../models/eventModel.js';
 import Notification from '../models/notificationModel.js';
 import Photo from '../models/photoModel.js';
-
-
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 // Obtener perfil del usuario
 export const getProfile = async (req, res) => {
   try {
@@ -18,7 +19,7 @@ export const getProfile = async (req, res) => {
     }
 
     const photos = await Photo.findAll({ where: { user_id: userId } });
-    const photoUrls = photos.map(photo => photo.url);
+    const photoUrls = photos.map(photo => ({ id: photo.id_photo, url: photo.url }));
 
     const profileData = {
       id_user: user.id_user,
@@ -47,6 +48,28 @@ export const getProfile = async (req, res) => {
   }
 };
 
+export const uploadPhotos = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'No files were uploaded.' });
+    }
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const photoUrls = req.files.map(file => `/uploads/${file.filename}`);
+
+    const photos = await Photo.bulkCreate(photoUrls.map(url => ({ user_id: userId, url })));
+
+    res.json({ message: 'Photos uploaded successfully', photoUrls: photos.map(photo => ({ id: photo.id_photo, url: photo.url })) });
+  } catch (error) {
+    console.error('Error uploading photos:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 export const updateProfile = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -94,25 +117,32 @@ export const uploadFile = (req, res) => {
   });
 };
 
-export const uploadPhotos = async (req, res) => {
+
+export const deletePhoto = async (req, res) => {
   try {
-    const { userId } = req.params;
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: 'No files were uploaded.' });
+    const { photoId } = req.params;
+    const photo = await Photo.findByPk(photoId);
+    if (!photo) {
+      return res.status(404).json({ message: 'Photo not found' });
     }
 
-    const user = await User.findByPk(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    // Obtener el directorio del archivo actual
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
 
-    const photoUrls = req.files.map(file => `/uploads/${file.filename}`);
+    // Eliminar el archivo físico si es necesario
+    const filePath = path.join(__dirname, '..', '..', 'uploads', photo.url.split('/uploads/')[1]);
+    fs.unlink(filePath, async (err) => {
+      if (err) {
+        console.error('Error deleting file:', err);
+        return res.status(500).json({ message: 'Error deleting file' });
+      }
 
-    await Photo.bulkCreate(photoUrls.map(url => ({ user_id: userId, url })));
-
-    res.json({ message: 'Photos uploaded successfully', photoUrls });
+      await photo.destroy();
+      res.json({ message: 'Photo deleted successfully' });
+    });
   } catch (error) {
-    console.error('Error uploading photos:', error);
+    console.error('Error deleting photo:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

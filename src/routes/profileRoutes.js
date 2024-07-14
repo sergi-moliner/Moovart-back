@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getProfile, updateProfile, uploadFile, uploadPhotos } from '../controllers/profileController.js';
+import { getProfile, updateProfile, uploadFile, uploadPhotos, deletePhoto } from '../controllers/profileController.js';
 import multer from 'multer';
 
 const storage = multer.diskStorage({
@@ -20,5 +20,6 @@ router.get('/:userId', getProfile); // Nota: cambiamos a userId para coincidir c
 router.put('/:userId', upload.single('profile_photo'), updateProfile);
 router.put('/:userId/photo', upload.single('profile_photo'), uploadFile);
 router.post('/:userId/photos', upload.array('photos', 5), uploadPhotos);
+router.delete('/photo/:photoId', deletePhoto);
 
 export default router;
